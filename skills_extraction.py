@@ -1,0 +1,56 @@
+import spacy
+from spacy.matcher import Matcher
+import PyPDF2
+import os
+
+# Load the Spacy English model
+nlp = spacy.load('en_core_web_sm')
+import csv
+from spacy.matcher import Matcher
+import csv
+
+# Read skills from CSV file
+file_path='skills.csv'
+with open(file_path, 'r') as file:
+    csv_reader = csv.reader(file)
+    skills = [row for row in csv_reader]
+
+# Create pattern dictionaries from skills
+skill_patterns = [[{'LOWER': skill}] for skill in skills[0]]
+
+# Create a Matcher object
+matcher = Matcher(nlp.vocab)
+
+# Add skill patterns to the matcher
+for pattern in skill_patterns:
+    matcher.add('Skills', [pattern])
+
+# Function to extract skills from text
+def extract_skills(text):
+    doc = nlp(text)
+    matches = matcher(doc)
+    skills = set()
+    for match_id, start, end in matches:
+        skill = doc[start:end].text
+        skills.add(skill)
+    return skills
+
+# Function to extract text from PDF
+def extract_text_from_pdf(file_path):
+    with open(file_path, 'rb') as f:
+        pdf_reader = PyPDF2.PdfReader(f)
+        resume_text = ''
+        for page in pdf_reader.pages:
+            resume_text += page.extract_text()
+    return resume_text
+
+def skills_extractor(resume_text):
+        # Extract text from PDF
+        # path='C:\Kedar\Programming\Projects\Job_Recommendation_System_DSA_Project'
+        # full_file_path = os.path.join(path, file_path)
+        # print("Extractor",file_path)
+        # resume_text = extract_text_from_pdf(file_path)
+
+        # Extract skills from resume text
+        skills = list(extract_skills(resume_text))
+        return skills
